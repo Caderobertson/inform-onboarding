@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Inform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #090909;
+      --surface:       #111111;
+      --surface-2:     #181818;
+      --border:        #222222;
+      --border-light:  #2e2e2e;
+      --text:          #F2F2F2;
+      --text-muted:    #666;
+      --text-soft:     #999;
+      --step-done:     #22C55E;
+      --step-active:   #F2F2F2;
+      --step-inactive: #1e1e1e;
+      --radius:        16px;
+      --font:          'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      padding-bottom: 80px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Header ─── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px 28px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .logo-text .logo-outline {
+      -webkit-text-stroke: 1.5px var(--text);
+      color: transparent;
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      position: relative;
+      height: 420px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('hero4.jpg');
+      background-size: cover;
+      background-position: center 20%;
+      filter: brightness(0.35) saturate(0.6);
+      transition: opacity 0.8s ease;
+    }
+
+    /* Subtle vignette */
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at center top, transparent 20%, rgba(9,9,9,0.5) 100%),
+        linear-gradient(to bottom, transparent 30%, rgba(9,9,9,0.98) 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      padding: 0 24px 52px;
+      max-width: 560px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(242,242,242,0.75);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 99px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: var(--step-done);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .hero-content h1 {
+      font-size: clamp(30px, 6vw, 46px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+
+    .hero-content p {
+      font-size: 15px;
+      color: rgba(242,242,242,0.5);
+      line-height: 1.65;
+      max-width: 380px;
+      margin: 0 auto;
+      font-weight: 400;
+    }
+
+    /* ─── Container ─── */
+    .container {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ─── Progress ─── */
+    .progress-wrap {
+      margin: 40px 0 36px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .progress-label span {
+      font-size: 12px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .progress-label .progress-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .progress-track {
+      background: var(--surface-2);
+      border-radius: 99px;
+      height: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--text);
+      border-radius: 99px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    /* ─── Step Cards ─── */
+    .steps { display: flex; flex-direction: column; gap: 12px; }
+
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 20px;
+      transition: border-color 0.25s, opacity 0.25s, box-shadow 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-card.active {
+      border-color: var(--border-light);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .step-card.done {
+      border-color: rgba(34,197,94,0.2);
+      opacity: 0.65;
+    }
+
+    .step-card.locked {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .step-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .step-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      background: var(--step-inactive);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 14px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .step-card.active .step-icon {
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+    }
+
+    .step-card.done .step-icon {
+      background: rgba(34,197,94,0.15);
+      color: var(--step-done);
+      font-size: 18px;
+    }
+
+    .step-info { flex: 1; min-width: 0; }
+
+    .step-info h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 3px;
+      color: var(--text);
+    }
+
+    .step-info p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .step-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--text);
+      color: #000;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 9px 18px;
+      border-radius: 9px;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.15s, transform 0.15s;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font);
+      letter-spacing: -0.1px;
+    }
+
+    .step-action:hover { opacity: 0.88; transform: translateY(-1px); }
+    .step-action:active { transform: translateY(0); }
+
+    .step-card.done .step-action {
+      background: transparent;
+      color: var(--step-done);
+      border: 1px solid rgba(34,197,94,0.3);
+      pointer-events: none;
+    }
+
+    /* ─── Video Step ─── */
+    .video-expand {
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+      max-height: 0;
+      opacity: 0;
+    }
+
+    .video-expand.open {
+      max-height: 600px;
+      opacity: 1;
+    }
+
+    .video-inner {
+      margin-top: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .vsl-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+    }
+
+    .vsl-container iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    .watch-confirm {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+      padding-bottom: 4px;
+    }
+
+    .watch-confirm button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-soft);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: 9px;
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .watch-confirm button:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    /* ─── All Done ─── */
+    .all-done {
+      display: none;
+      text-align: center;
+      padding: 60px 24px 40px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .done-icon { font-size: 48px; margin-bottom: 20px; }
+
+    .all-done h2 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .all-done p {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    /* ─── Divider ─── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 0 36px;
+    }
+
+    /* ─── Section label ─── */
+    .section-label {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .section-label h2 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      margin-bottom: 6px;
+    }
+
+    .section-label p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ─── Mobile ─── */
+    @media (max-width: 520px) {
+      .step-top { flex-wrap: wrap; }
+      .step-action { width: 100%; justify-content: center; margin-top: 12px; }
+      .hero-inner { height: 380px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-text">IN<span class="logo-outline">FORM</span></div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-bg" id="heroBg"></div>
+      <div class="hero-vignette"></div>
+      <div class="hero-content">
+        <div class="hero-badge">Welcome to the team!</div>
+        <h1>You're in.<br>Let's get you set up.</h1>
+        <p>Complete the steps below to kick off your transformation. It takes less than 5 minutes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <div class="container">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Your setup</span>
+        <span class="progress-count" id="progressCount">0 of 4 complete</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <h2>Complete your setup</h2>
+      <p>4 steps — takes less than 5 minutes</p>
+    </div>
+
+    <div class="steps" id="stepsContainer">
+
+      <!-- Step 1: Watch the video -->
+      <div class="step-card active" id="step-1">
+        <div class="step-top">
+          <div class="step-icon" id="icon-1">▶</div>
+          <div class="step-info">
+            <h3>Watch your welcome video</h3>
+            <p>A message from Cade and Lily before you get started.</p>
+          </div>
+          <button class="step-action" id="btn-1" onclick="toggleVideo()">Watch →</button>
+        </div>
+        <!-- Expandable video -->
+        <div class="video-expand" id="videoExpand">
+          <div class="video-inner">
+            <div class="vsl-container">
+              <iframe
+                id="welcomeVideo"
+                src="https://www.youtube.com/embed/Oy7XbkriCwA?rel=0&modestbranding=1&enablejsapi=1"
+                allowfullscreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              ></iframe>
+            </div>
+          </div>
+          <div class="watch-confirm">
+            <button onclick="markDone(1)">✓ I've watched it — continue</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Onboarding form -->
+      <div class="step-card locked" id="step-2">
+        <div class="step-top">
+          <div class="step-icon" id="icon-2">2</div>
+          <div class="step-info">
+            <h3>Fill in your onboarding form</h3>
+            <p>Tell us about your goals, training history, and lifestyle so we can build your custom plan.</p>
+          </div>
+          <a class="step-action" href="https://public.1fit.com/leadforms/0198d42f-f328-717f-81b2-f3ec749432cb" target="_blank" id="btn-2" onclick="delayMark(2)">Start →</a>
+        </div>
+      </div>
+
+      <!-- Step 3: Telegram -->
+      <div class="step-card locked" id="step-3">
+        <div class="step-top">
+          <div class="step-icon" id="icon-3">3</div>
+          <div class="step-info">
+            <h3>Download Telegram</h3>
+            <p>This is how you'll communicate with your coach. Download and set up your account.</p>
+          </div>
+          <a class="step-action" href="https://telegram.org/dl" target="_blank" id="btn-3" onclick="delayMark(3)">Download →</a>
+        </div>
+      </div>
+
+      <!-- Step 4: Community -->
+      <div class="step-card locked" id="step-4">
+        <div class="step-top">
+          <div class="step-icon" id="icon-4">4</div>
+          <div class="step-info">
+            <h3>Join the community</h3>
+            <p>Connect with other Inform clients, share wins, and stay motivated together.</p>
+          </div>
+          <a class="step-action" href="https://www.facebook.com/share/g/1Dsujwvfok/" target="_blank" id="btn-4" onclick="delayMark(4)">Join →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- All done -->
+  <div class="all-done" id="allDone">
+    <div class="done-icon">✦</div>
+    <h2>You're all set.</h2>
+    <p>Your coach will be in touch via Telegram shortly.<br>Get ready — your transformation starts now.</p>
+  </div>
+
+  <script>
+    const TOTAL = 4;
+    const completed = new Set();
+    let videoOpen = false;
+
+    // Restore from localStorage
+    for (let i = 1; i <= TOTAL; i++) {
+      if (localStorage.getItem(`inform_step_${i}`) === 'done') completed.add(i);
+    }
+
+    function toggleVideo() {
+      const expand = document.getElementById('videoExpand');
+      const btn = document.getElementById('btn-1');
+      videoOpen = !videoOpen;
+      expand.classList.toggle('open', videoOpen);
+      btn.textContent = videoOpen ? 'Close ✕' : 'Watch →';
+    }
+
+    function markDone(step) {
+      completed.add(step);
+      localStorage.setItem(`inform_step_${step}`, 'done');
+      if (step === 1) {
+        // Close video
+        document.getElementById('videoExpand').classList.remove('open');
+        videoOpen = false;
+      }
+      updateUI();
+    }
+
+    function delayMark(step) {
+      setTimeout(() => markDone(step), 900);
+    }
+
+    function updateUI() {
+      let nextActive = false;
+      for (let i = 1; i <= TOTAL; i++) {
+        const card = document.getElementById(`step-${i}`);
+        const icon = document.getElementById(`icon-${i}`);
+        const btn = document.getElementById(`btn-${i}`);
+
+        if (completed.has(i)) {
+          card.className = 'step-card done';
+          icon.textContent = '✓';
+          if (btn) { btn.textContent = 'Done'; }
+        } else if (!nextActive) {
+          card.className = 'step-card active';
+          nextActive = true;
+        } else {
+          card.className = 'step-card locked';
+        }
+      }
+
+      // Progress
+      const pct = (completed.size / TOTAL) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressCount').textContent = `${completed.size} of ${TOTAL} complete`;
+
+      // All done
+      if (completed.size === TOTAL) {
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('allDone').style.display = 'block';
+      }
+    }
+
+    // Hero bg — rotate through images for best aesthetic
+    const heroImages = ['hero4.jpg','hero2.jpg','hero3.jpg'];
+    document.getElementById('heroBg').style.backgroundImage = `url('${heroImages[0]}')`;
+
+    updateUI();
+  </script>
+
+</body>
+</html>
